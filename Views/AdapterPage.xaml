@@ -1,0 +1,232 @@
+<Page
+    x:Class="IpForge.Views.AdapterPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Loaded="AdapterPage_Loaded">
+
+    <ScrollViewer>
+        <StackPanel
+            Padding="32"
+            Spacing="16">
+
+            <StackPanel Margin="0,0,0,8">
+                <TextBlock
+                    Text="Adapters"
+                    FontSize="32"
+                    FontWeight="SemiBold"/>
+
+                <TextBlock
+                    Margin="0,6,0,0"
+                    Text="View and configure an IPv4 network adapter."
+                    Opacity="0.65"/>
+            </StackPanel>
+
+            <StackPanel>
+                <TextBlock
+                    Margin="0,0,0,8"
+                    Text="Network adapter"
+                    FontWeight="SemiBold"/>
+
+                <ComboBox
+                    x:Name="AdapterComboBox"
+                    Width="420"
+                    HorizontalAlignment="Left"
+                    PlaceholderText="Select an adapter"
+                    SelectionChanged="AdapterComboBox_SelectionChanged"/>
+            </StackPanel>
+
+            <Border
+                Padding="20"
+                CornerRadius="8"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1">
+
+                <StackPanel Spacing="10">
+                    <TextBlock
+                        Text="Current configuration"
+                        FontSize="18"
+                        FontWeight="SemiBold"/>
+
+                    <Grid ColumnSpacing="24" RowSpacing="8">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="130"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <TextBlock Text="Status"/>
+
+                        <TextBlock
+                            x:Name="StatusTextBlock"
+                            Grid.Column="1"
+                            Text="—"/>
+
+                        <TextBlock
+                            Grid.Row="1"
+                            Text="Mode"/>
+
+                        <TextBlock
+                            x:Name="ModeTextBlock"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Text="—"/>
+
+                        <TextBlock
+                            Grid.Row="2"
+                            Text="IP address"/>
+
+                        <TextBlock
+                            x:Name="IpAddressTextBlock"
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Text="—"/>
+
+                        <TextBlock
+                            Grid.Row="3"
+                            Text="Subnet mask"/>
+
+                        <TextBlock
+                            x:Name="SubnetMaskTextBlock"
+                            Grid.Row="3"
+                            Grid.Column="1"
+                            Text="—"/>
+
+                        <TextBlock
+                            Grid.Row="4"
+                            Text="Gateway"/>
+
+                        <TextBlock
+                            x:Name="GatewayTextBlock"
+                            Grid.Row="4"
+                            Grid.Column="1"
+                            Text="—"/>
+
+                        <TextBlock
+                            Grid.Row="5"
+                            Text="DNS"/>
+
+                        <TextBlock
+                            x:Name="DnsTextBlock"
+                            Grid.Row="5"
+                            Grid.Column="1"
+                            Text="—"
+                            TextWrapping="Wrap"/>
+                    </Grid>
+                </StackPanel>
+            </Border>
+
+            <Border
+                Padding="20"
+                CornerRadius="8"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1">
+
+                <StackPanel Spacing="16">
+                    <TextBlock
+                        Text="New configuration"
+                        FontSize="18"
+                        FontWeight="SemiBold"/>
+
+                    <Grid
+    ColumnSpacing="16"
+    RowSpacing="12">
+
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <ToggleSwitch
+                            x:Name="DhcpToggleSwitch"
+                            Grid.Row="0"
+                            Grid.Column="0"
+                            VerticalAlignment="Bottom"
+                            Header="Configuration mode"
+                            Margin="0,0,0,12"
+                            OnContent="DHCP"
+                            OffContent="Static"
+                            Toggled="DhcpToggleSwitch_Toggled"/>
+
+                        <ComboBox
+                            x:Name="PresetComboBox"
+                            Grid.Row="0"
+                            Grid.Column="1"
+                            HorizontalAlignment="Stretch"
+                            Header="Preset (optional)"
+                            Margin="0,0,0,12"
+                            PlaceholderText="Select a preset"
+                            DisplayMemberPath="Name"
+                            SelectionChanged="PresetComboBox_SelectionChanged"/>
+
+                        <TextBox
+                            x:Name="IpAddressTextBox"
+                            Grid.Row="1"
+                            Grid.Column="0"
+                            Header="IP address"
+                            PlaceholderText="192.168.1.100"/>
+
+                        <TextBox
+                            x:Name="SubnetMaskTextBox"
+                            Grid.Row="1"
+                            Grid.Column="1"
+                            Header="Subnet mask"
+                            PlaceholderText="255.255.255.0"/>
+
+                        <TextBox
+                            x:Name="GatewayTextBox"
+                            Grid.Row="2"
+                            Grid.Column="0"
+                            Header="Gateway (optional)"
+                            PlaceholderText="192.168.1.1"/>
+
+                        <TextBox
+                            x:Name="PrimaryDnsTextBox"
+                            Grid.Row="2"
+                            Grid.Column="1"
+                            Header="Primary DNS (optional)"
+                            PlaceholderText="8.8.8.8"/>
+
+                        <TextBox
+                            x:Name="SecondaryDnsTextBox"
+                            Grid.Row="3"
+                            Grid.Column="0"
+                            Header="Secondary DNS (optional)"
+                            PlaceholderText="8.8.4.4"/>
+                    </Grid>
+
+                    <StackPanel
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="12">
+
+                        <Button
+                            Content="Reset"
+                            Click="ResetButton_Click"/>
+
+                        <Button
+                            Content="Validate configuration"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Click="ApplyConfigurationButton_Click"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </StackPanel>
+    </ScrollViewer>
+</Page>

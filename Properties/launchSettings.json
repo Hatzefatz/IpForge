@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "IpForge (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "IpForge (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}

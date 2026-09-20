@@ -1,0 +1,178 @@
+<Page
+    x:Class="IpForge.Views.PresetsPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Loaded="PresetsPage_Loaded">
+
+    <Grid Padding="32">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="24"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <StackPanel>
+            <TextBlock
+                Text="Presets"
+                FontSize="32"
+                FontWeight="SemiBold"/>
+
+            <TextBlock
+                Margin="0,6,0,0"
+                Text="Create and manage reusable static IPv4 configurations."
+                Opacity="0.65"/>
+        </StackPanel>
+
+        <Grid
+            Grid.Row="2"
+            ColumnSpacing="16">
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="260"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Preset list -->
+            <Border
+                Padding="16"
+                CornerRadius="8"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="12"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="12"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock
+                        Text="Saved presets"
+                        FontSize="18"
+                        FontWeight="SemiBold"/>
+
+                    <ListView
+                        x:Name="PresetListView"
+                        Grid.Row="2"
+                        SelectionMode="Single"
+                        SelectionChanged="PresetListView_SelectionChanged">
+
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <StackPanel Padding="4">
+                                    <TextBlock
+                                        Text="{Binding Name}"
+                                        FontWeight="SemiBold"/>
+
+                                    <TextBlock
+                                        Text="{Binding IpAddress}"
+                                        Opacity="0.65"/>
+                                </StackPanel>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+
+                    <Button
+                        Grid.Row="4"
+                        HorizontalAlignment="Stretch"
+                        Content="New preset"
+                        Click="NewPresetButton_Click"/>
+                </Grid>
+            </Border>
+
+            <!-- Preset editor -->
+            <Border
+                Grid.Column="1"
+                Padding="20"
+                CornerRadius="8"
+                Background="{ThemeResource CardBackgroundFillColorDefaultBrush}"
+                BorderBrush="{ThemeResource CardStrokeColorDefaultBrush}"
+                BorderThickness="1">
+
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="16"/>
+                        <RowDefinition Height="*"/>
+                        <RowDefinition Height="16"/>
+                        <RowDefinition Height="Auto"/>
+                    </Grid.RowDefinitions>
+
+                    <TextBlock
+                        x:Name="EditorTitleTextBlock"
+                        Text="New preset"
+                        FontSize="18"
+                        FontWeight="SemiBold"/>
+
+                    <ScrollViewer Grid.Row="2">
+                        <StackPanel Spacing="12">
+                            <TextBox
+                                x:Name="PresetNameTextBox"
+                                Header="Preset name"
+                                PlaceholderText="PLC Network"/>
+
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox
+                                    x:Name="IpAddressTextBox"
+                                    Header="IP address"
+                                    PlaceholderText="192.168.1.100"/>
+
+                                <TextBox
+                                    x:Name="SubnetMaskTextBox"
+                                    Grid.Column="1"
+                                    Header="Subnet mask"
+                                    PlaceholderText="255.255.255.0"/>
+                            </Grid>
+
+                            <TextBox
+                                x:Name="GatewayTextBox"
+                                Header="Gateway (optional)"
+                                PlaceholderText="192.168.1.1"/>
+
+                            <Grid ColumnSpacing="16">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+
+                                <TextBox
+                                    x:Name="PrimaryDnsTextBox"
+                                    Header="Primary DNS (optional)"
+                                    PlaceholderText="8.8.8.8"/>
+
+                                <TextBox
+                                    x:Name="SecondaryDnsTextBox"
+                                    Grid.Column="1"
+                                    Header="Secondary DNS (optional)"
+                                    PlaceholderText="8.8.4.4"/>
+                            </Grid>
+                        </StackPanel>
+                    </ScrollViewer>
+
+                    <Grid Grid.Row="4">
+                        <Button
+                            x:Name="DeletePresetButton"
+                            HorizontalAlignment="Left"
+                            Content="Delete"
+                            IsEnabled="False"
+                            Click="DeletePresetButton_Click"/>
+
+                        <Button
+                            HorizontalAlignment="Right"
+                            Content="Save preset"
+                            Style="{StaticResource AccentButtonStyle}"
+                            Click="SavePresetButton_Click"/>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Grid>
+    </Grid>
+</Page>
