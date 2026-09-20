@@ -2,7 +2,6 @@ using IpForge.Models;
 using IpForge.Services;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
-using Microsoft.UI.Xaml.Controls.Primitives;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +50,8 @@ public sealed partial class AdapterPage : Page
         {
             await ShowMessageDialogAsync(
                 "Could not load presets",
-                "The preset file could not be read.");
+                "The preset file could not be read.",
+                InfoBarSeverity.Error);
         }
     }
 
@@ -99,9 +99,11 @@ public sealed partial class AdapterPage : Page
         LoadAdapters(selectedAdapterId);
     }
     private void AdapterComboBox_SelectionChanged(
-        object sender,
-        SelectionChangedEventArgs e)
+    object sender,
+    SelectionChangedEventArgs e)
     {
+        NotificationInfoBar.IsOpen = false;
+
         if (AdapterComboBox.SelectedItem is not
             NetworkInterface adapter)
         {
@@ -110,6 +112,9 @@ public sealed partial class AdapterPage : Page
         }
 
         DisplayAdapterConfiguration(adapter);
+
+        ResetButton.IsEnabled = true;
+        ApplyConfigurationButton.IsEnabled = true;
     }
 
     private void DisplayAdapterConfiguration(
@@ -269,8 +274,8 @@ public sealed partial class AdapterPage : Page
             return;
         }
 
-        if (!ValidateConfiguration())
-        {
+        if(!await ValidateConfigurationAsync())
+{
             return;
         }
 
@@ -318,80 +323,197 @@ public sealed partial class AdapterPage : Page
 
             await ShowMessageDialogAsync(
                 "Configuration applied",
-                $"{mode} was applied to {adapterName}.");
+                $"{mode} was applied to {adapterName}.",
+                InfoBarSeverity.Success);
         }
         catch (Exception exception)
         {
             await ShowMessageDialogAsync(
                 "Configuration failed",
-                exception.Message);
+                exception.Message,
+                InfoBarSeverity.Error);
         }
         finally
         {
             SetApplyingState(false);
         }
     }
+    private static bool AreInSameSubnet(
+    string firstAddress,
+    string secondAddress,
+    string subnetMask)
+    {
+        uint first = ConvertIpv4ToUInt32(
+            IPAddress.Parse(firstAddress));
 
-    private bool ValidateConfiguration()
+        uint second = ConvertIpv4ToUInt32(
+            IPAddress.Parse(secondAddress));
+
+        uint mask = ConvertIpv4ToUInt32(
+            IPAddress.Parse(subnetMask));
+
+        return (first & mask) == (second & mask);
+    }
+
+    private static bool IsNetworkOrBroadcastAddress(
+        string ipAddress,
+        string subnetMask)
+    {
+        uint address = ConvertIpv4ToUInt32(
+            IPAddress.Parse(ipAddress));
+
+        uint mask = ConvertIpv4ToUInt32(
+            IPAddress.Parse(subnetMask));
+
+        int prefixLength = CountMaskBits(mask);
+
+        // /31 and /32 networks do not use the traditional
+        // network and broadcast address rules.
+        if (prefixLength >= 31)
+        {
+            return false;
+        }
+
+        uint networkAddress = address & mask;
+        uint broadcastAddress =
+            networkAddress | ~mask;
+
+        return address == networkAddress ||
+               address == broadcastAddress;
+    }
+
+    private static int CountMaskBits(uint mask)
+    {
+        int count = 0;
+
+        while (mask != 0)
+        {
+            count += (int)(mask & 1);
+            mask >>= 1;
+        }
+
+        return count;
+    }
+
+    private static uint ConvertIpv4ToUInt32(
+        IPAddress address)
+    {
+        byte[] bytes = address.GetAddressBytes();
+
+        return ((uint)bytes[0] << 24) |
+               ((uint)bytes[1] << 16) |
+               ((uint)bytes[2] << 8) |
+               bytes[3];
+    }
+    private async Task<bool> ValidateConfigurationAsync()
     {
         if (DhcpToggleSwitch.IsOn)
         {
             return true;
         }
 
-        if (!IsValidIpv4(IpAddressTextBox.Text))
+        string ipAddress = IpAddressTextBox.Text.Trim();
+        string subnetMask = SubnetMaskTextBox.Text.Trim();
+        string gateway = GatewayTextBox.Text.Trim();
+        string primaryDns = PrimaryDnsTextBox.Text.Trim();
+        string secondaryDns = SecondaryDnsTextBox.Text.Trim();
+
+        if (!IsValidIpv4(ipAddress))
         {
-            _ = ShowMessageDialogAsync(
+            await ShowMessageDialogAsync(
                 "Invalid IP address",
                 "Enter a valid IPv4 address.");
 
             return false;
         }
 
-        if (!IsValidSubnetMask(SubnetMaskTextBox.Text))
+        if (!IsValidSubnetMask(subnetMask))
         {
-            _ = ShowMessageDialogAsync(
+            await ShowMessageDialogAsync(
                 "Invalid subnet mask",
-                "Enter a valid IPv4 subnet mask.");
+                "Enter a valid IPv4 subnet mask such as 255.255.255.0.");
 
             return false;
         }
 
-        if (!IsValidOptionalIpv4(GatewayTextBox.Text))
+        if (!IsValidOptionalIpv4(gateway))
         {
-            _ = ShowMessageDialogAsync(
+            await ShowMessageDialogAsync(
                 "Invalid gateway",
                 "Enter a valid IPv4 gateway or leave it empty.");
 
             return false;
         }
 
-        if (!IsValidOptionalIpv4(PrimaryDnsTextBox.Text))
+        if (!IsValidOptionalIpv4(primaryDns))
         {
-            _ = ShowMessageDialogAsync(
+            await ShowMessageDialogAsync(
                 "Invalid primary DNS",
                 "Enter a valid IPv4 DNS server or leave it empty.");
 
             return false;
         }
 
-        if (!IsValidOptionalIpv4(SecondaryDnsTextBox.Text))
+        if (!IsValidOptionalIpv4(secondaryDns))
         {
-            _ = ShowMessageDialogAsync(
+            await ShowMessageDialogAsync(
                 "Invalid secondary DNS",
                 "Enter a valid IPv4 DNS server or leave it empty.");
 
             return false;
         }
 
-        if (string.IsNullOrWhiteSpace(
-                PrimaryDnsTextBox.Text) &&
-            !string.IsNullOrWhiteSpace(
-                SecondaryDnsTextBox.Text))
+        if (string.IsNullOrWhiteSpace(primaryDns) &&
+            !string.IsNullOrWhiteSpace(secondaryDns))
         {
-            _ = ShowMessageDialogAsync(
+            await ShowMessageDialogAsync(
                 "Primary DNS required",
                 "Enter a primary DNS server before adding a secondary DNS server.");
+
+            return false;
+        }
+
+        if (IsNetworkOrBroadcastAddress(
+                ipAddress,
+                subnetMask))
+        {
+            await ShowMessageDialogAsync(
+                "Unusable IP address",
+                "The IP address is the network or broadcast address for this subnet.");
+
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(gateway) &&
+            !AreInSameSubnet(
+                ipAddress,
+                gateway,
+                subnetMask))
+        {
+            await ShowMessageDialogAsync(
+                "Gateway outside subnet",
+                "The gateway must be in the same subnet as the IP address.");
+
+            return false;
+        }
+
+        if (!string.IsNullOrWhiteSpace(gateway) &&
+            IsNetworkOrBroadcastAddress(
+                gateway,
+                subnetMask))
+        {
+            await ShowMessageDialogAsync(
+                "Invalid gateway",
+                "The gateway cannot be the network or broadcast address.");
+
+            return false;
+        }
+
+        if (ipAddress == gateway)
+        {
+            await ShowMessageDialogAsync(
+                "Invalid gateway",
+                "The gateway cannot be the same as the adapter IP address.");
 
             return false;
         }
@@ -504,26 +626,31 @@ public sealed partial class AdapterPage : Page
         return true;
     }
 
-    private async Task ShowMessageDialogAsync(
-        string title,
-        string message)
+    private Task ShowMessageDialogAsync(
+    string title,
+    string message,
+    InfoBarSeverity severity = InfoBarSeverity.Warning)
     {
-        ContentDialog dialog = new()
-        {
-            XamlRoot = XamlRoot,
-            Title = title,
-            Content = message,
-            CloseButtonText = "OK"
-        };
+        NotificationInfoBar.Title = title;
+        NotificationInfoBar.Message = message;
+        NotificationInfoBar.Severity = severity;
+        NotificationInfoBar.IsOpen = true;
 
-        await dialog.ShowAsync();
+        return Task.CompletedTask;
     }
     private void SetApplyingState(bool isApplying)
     {
+        bool adapterSelected =
+            AdapterComboBox.SelectedItem is NetworkInterface;
+
         AdapterComboBox.IsEnabled = !isApplying;
         RefreshButton.IsEnabled = !isApplying;
-        ResetButton.IsEnabled = !isApplying;
-        ApplyConfigurationButton.IsEnabled = !isApplying;
+
+        ResetButton.IsEnabled =
+            !isApplying && adapterSelected;
+
+        ApplyConfigurationButton.IsEnabled =
+            !isApplying && adapterSelected;
 
         DhcpToggleSwitch.IsEnabled = !isApplying;
         PresetComboBox.IsEnabled = !isApplying;
@@ -570,7 +697,8 @@ public sealed partial class AdapterPage : Page
         GatewayTextBox.Text = string.Empty;
         PrimaryDnsTextBox.Text = string.Empty;
         SecondaryDnsTextBox.Text = string.Empty;
-
+        ResetButton.IsEnabled = false;
+        ApplyConfigurationButton.IsEnabled = false;
         UpdateConfigurationMode();
     }
 }
