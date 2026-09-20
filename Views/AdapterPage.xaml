@@ -212,18 +212,21 @@
                     </Grid>
 
                     <StackPanel
-                        Orientation="Horizontal"
                         HorizontalAlignment="Right"
+                        Orientation="Horizontal"
                         Spacing="12">
 
                         <Button
+                            x:Name="ResetButton"
                             Content="Reset"
                             Click="ResetButton_Click"/>
 
                         <Button
-                            Content="Validate configuration"
+                            x:Name="ApplyConfigurationButton"
+                            Content="Apply configuration"
                             Style="{StaticResource AccentButtonStyle}"
                             Click="ApplyConfigurationButton_Click"/>
+
                     </StackPanel>
                 </StackPanel>
             </Border>
