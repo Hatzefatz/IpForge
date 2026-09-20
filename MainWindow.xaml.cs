@@ -4,6 +4,7 @@ using Microsoft.UI.Windowing;
 using Microsoft.UI.Xaml;
 using Microsoft.UI.Xaml.Controls;
 using Windows.Graphics;
+using System.IO;
 
 namespace IpForge;
 
@@ -12,7 +13,11 @@ public sealed partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
+        string iconPath = Path.Combine(
+        AppContext.BaseDirectory,
+        "IpForge.ico");
 
+        AppWindow.SetIcon(iconPath);
         ResizeAndCenterWindow();
 
         RootNavigationView.SelectedItem =
