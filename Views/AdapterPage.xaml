@@ -36,9 +36,42 @@
 
                         <ComboBox
                             x:Name="AdapterComboBox"
-                            Width="420"
+                            Width="520"
                             PlaceholderText="Select an adapter"
-                            SelectionChanged="AdapterComboBox_SelectionChanged"/>
+                            SelectionChanged="AdapterComboBox_SelectionChanged">
+
+                            <ComboBox.ItemTemplate>
+                                <DataTemplate>
+                                    <Grid
+                                        Width="470"
+                                        ColumnSpacing="16">
+
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <StackPanel Grid.Column="0">
+                                            <TextBlock
+                                                FontWeight="SemiBold"
+                                                Text="{Binding Name}"/>
+                                            <TextBlock
+                                                MaxWidth="380"
+                                                FontSize="12"
+                                                Opacity="0.65"
+                                                Text="{Binding Description}"
+                                                TextTrimming="CharacterEllipsis"/>
+                                        </StackPanel>
+
+                                        <TextBlock
+                                            Grid.Column="1"
+                                            VerticalAlignment="Center"
+                                            Opacity="0.75"
+                                            Text="{Binding OperationalStatus}"/>
+                                    </Grid>
+                                </DataTemplate>
+                            </ComboBox.ItemTemplate>
+                        </ComboBox>
 
                         <Button
                             x:Name="RefreshButton"

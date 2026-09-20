@@ -56,7 +56,7 @@ public sealed partial class AdapterPage : Page
     }
 
     private void LoadAdapters(
-        string? selectedAdapterId = null)
+    string? selectedAdapterId = null)
     {
         _adapters = NetworkInterface
             .GetAllNetworkInterfaces()
@@ -72,8 +72,6 @@ public sealed partial class AdapterPage : Page
             .ToArray();
 
         AdapterComboBox.ItemsSource = _adapters;
-        AdapterComboBox.DisplayMemberPath =
-            nameof(NetworkInterface.Name);
 
         if (selectedAdapterId is null)
         {
