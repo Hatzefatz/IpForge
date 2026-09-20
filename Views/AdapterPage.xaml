@@ -27,12 +27,32 @@
                     Text="Network adapter"
                     FontWeight="SemiBold"/>
 
-                <ComboBox
-                    x:Name="AdapterComboBox"
-                    Width="420"
-                    HorizontalAlignment="Left"
-                    PlaceholderText="Select an adapter"
-                    SelectionChanged="AdapterComboBox_SelectionChanged"/>
+                <StackPanel
+                    Orientation="Horizontal"
+                    Spacing="8">
+
+                    <ComboBox
+                        x:Name="AdapterComboBox"
+                        Width="420"
+                        PlaceholderText="Select an adapter"
+                        SelectionChanged="AdapterComboBox_SelectionChanged"/>
+
+                    <Button
+                        x:Name="RefreshButton"
+                        VerticalAlignment="Stretch"
+                        Click="RefreshButton_Click"
+                        ToolTipService.ToolTip="Refresh network adapters">
+
+                        <StackPanel
+                            Orientation="Horizontal"
+                            Spacing="8">
+
+                            <SymbolIcon Symbol="Refresh"/>
+
+                            <TextBlock Text="Refresh"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
             </StackPanel>
 
             <Border
@@ -48,7 +68,10 @@
                         FontSize="18"
                         FontWeight="SemiBold"/>
 
-                    <Grid ColumnSpacing="24" RowSpacing="8">
+                    <Grid
+                        ColumnSpacing="24"
+                        RowSpacing="8">
+
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="130"/>
                             <ColumnDefinition Width="*"/>
@@ -138,8 +161,9 @@
                         FontWeight="SemiBold"/>
 
                     <Grid
-    ColumnSpacing="16"
-    RowSpacing="12">
+                        x:Name="ConfigurationGrid"
+                        ColumnSpacing="16"
+                        RowSpacing="12">
 
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*"/>
@@ -157,9 +181,9 @@
                             x:Name="DhcpToggleSwitch"
                             Grid.Row="0"
                             Grid.Column="0"
+                            Margin="0,0,0,12"
                             VerticalAlignment="Bottom"
                             Header="Configuration mode"
-                            Margin="0,0,0,12"
                             OnContent="DHCP"
                             OffContent="Static"
                             Toggled="DhcpToggleSwitch_Toggled"/>
@@ -168,9 +192,9 @@
                             x:Name="PresetComboBox"
                             Grid.Row="0"
                             Grid.Column="1"
+                            Margin="0,0,0,12"
                             HorizontalAlignment="Stretch"
                             Header="Preset (optional)"
-                            Margin="0,0,0,12"
                             PlaceholderText="Select a preset"
                             DisplayMemberPath="Name"
                             SelectionChanged="PresetComboBox_SelectionChanged"/>
@@ -211,23 +235,49 @@
                             PlaceholderText="8.8.4.4"/>
                     </Grid>
 
-                    <StackPanel
-                        HorizontalAlignment="Right"
-                        Orientation="Horizontal"
-                        Spacing="12">
+                    <Grid ColumnSpacing="12">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="Auto"/>
+                        </Grid.ColumnDefinitions>
 
-                        <Button
-                            x:Name="ResetButton"
-                            Content="Reset"
-                            Click="ResetButton_Click"/>
+                        <StackPanel
+                            VerticalAlignment="Center"
+                            Orientation="Horizontal"
+                            Spacing="8">
 
-                        <Button
-                            x:Name="ApplyConfigurationButton"
-                            Content="Apply configuration"
-                            Style="{StaticResource AccentButtonStyle}"
-                            Click="ApplyConfigurationButton_Click"/>
+                            <ProgressRing
+                                x:Name="ApplyingProgressRing"
+                                Width="20"
+                                Height="20"
+                                IsActive="False"
+                                Visibility="Collapsed"/>
 
-                    </StackPanel>
+                            <TextBlock
+                                x:Name="ApplyingStatusTextBlock"
+                                VerticalAlignment="Center"
+                                Text="Applying configuration..."
+                                Opacity="0.7"
+                                Visibility="Collapsed"/>
+                        </StackPanel>
+
+                        <StackPanel
+                            Grid.Column="1"
+                            Orientation="Horizontal"
+                            Spacing="12">
+
+                            <Button
+                                x:Name="ResetButton"
+                                Content="Reset"
+                                Click="ResetButton_Click"/>
+
+                            <Button
+                                x:Name="ApplyConfigurationButton"
+                                Content="Apply configuration"
+                                Style="{StaticResource AccentButtonStyle}"
+                                Click="ApplyConfigurationButton_Click"/>
+                        </StackPanel>
+                    </Grid>
                 </StackPanel>
             </Border>
         </StackPanel>

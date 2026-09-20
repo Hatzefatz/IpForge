@@ -89,7 +89,15 @@ public sealed partial class AdapterPage : Page
             AdapterComboBox.SelectedItem = selectedAdapter;
         }
     }
+    private void RefreshButton_Click(
+    object sender,
+    RoutedEventArgs e)
+    {
+        string? selectedAdapterId =
+            (AdapterComboBox.SelectedItem as NetworkInterface)?.Id;
 
+        LoadAdapters(selectedAdapterId);
+    }
     private void AdapterComboBox_SelectionChanged(
         object sender,
         SelectionChangedEventArgs e)
@@ -248,8 +256,8 @@ public sealed partial class AdapterPage : Page
     }
 
     private async void ApplyConfigurationButton_Click(
-        object sender,
-        RoutedEventArgs e)
+    object sender,
+    RoutedEventArgs e)
     {
         if (AdapterComboBox.SelectedItem is not
             NetworkInterface adapter)
@@ -278,9 +286,7 @@ public sealed partial class AdapterPage : Page
         string adapterName = adapter.Name;
         bool useDhcp = DhcpToggleSwitch.IsOn;
 
-        ApplyConfigurationButton.IsEnabled = false;
-        ResetButton.IsEnabled = false;
-        AdapterComboBox.IsEnabled = false;
+        SetApplyingState(true);
 
         try
         {
@@ -308,7 +314,7 @@ public sealed partial class AdapterPage : Page
 
             string mode = useDhcp
                 ? "DHCP"
-                : "the static IPv4 configuration";
+                : "The static IPv4 configuration";
 
             await ShowMessageDialogAsync(
                 "Configuration applied",
@@ -322,9 +328,7 @@ public sealed partial class AdapterPage : Page
         }
         finally
         {
-            ApplyConfigurationButton.IsEnabled = true;
-            ResetButton.IsEnabled = true;
-            AdapterComboBox.IsEnabled = true;
+            SetApplyingState(false);
         }
     }
 
@@ -514,7 +518,40 @@ public sealed partial class AdapterPage : Page
 
         await dialog.ShowAsync();
     }
+    private void SetApplyingState(bool isApplying)
+    {
+        AdapterComboBox.IsEnabled = !isApplying;
+        RefreshButton.IsEnabled = !isApplying;
+        ResetButton.IsEnabled = !isApplying;
+        ApplyConfigurationButton.IsEnabled = !isApplying;
 
+        DhcpToggleSwitch.IsEnabled = !isApplying;
+        PresetComboBox.IsEnabled = !isApplying;
+        IpAddressTextBox.IsEnabled = !isApplying;
+        SubnetMaskTextBox.IsEnabled = !isApplying;
+        GatewayTextBox.IsEnabled = !isApplying;
+        PrimaryDnsTextBox.IsEnabled = !isApplying;
+        SecondaryDnsTextBox.IsEnabled = !isApplying;
+
+        ApplyingProgressRing.IsActive = isApplying;
+
+        ApplyingProgressRing.Visibility = isApplying
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
+        ApplyingStatusTextBlock.Visibility = isApplying
+            ? Visibility.Visible
+            : Visibility.Collapsed;
+
+        ApplyConfigurationButton.Content = isApplying
+            ? "Applying..."
+            : "Apply configuration";
+
+        if (!isApplying)
+        {
+            UpdateConfigurationMode();
+        }
+    }
     private void ClearConfiguration()
     {
         PresetComboBox.SelectedItem = null;
